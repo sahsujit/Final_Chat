@@ -1,15 +1,53 @@
-import { AppBar, Box, IconButton, Toolbar, Typography } from "@mui/material";
-import React from "react";
+import {
+  AppBar,
+  Box,
+  IconButton,
+  Toolbar,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import React, { lazy, Suspense, useState } from "react";
 import { orange } from "../../constants/color";
-import {Menu as MenuIcon, Search as SearchIcon} from "@mui/icons-material";
+import {
+  Add as AddIcon,
+  Group as GroupIcon,
+  Logout as LogoutIcon,
+  Menu as MenuIcon,
+  Notifications as NotificationsIcon,
+  Search as SearchIcon,
+} from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
+const  SearchDialog =lazy(()=>import("../specific/Search")) ;
+const NewGroupDialog = lazy(() => import("../specific/NewGroup"));
+const NotificationsDialog = lazy(() => import("../specific/Notifications"));
 
 const Header = () => {
-    const handleMobile = () => {
-        console.log("Mobile menu clicked");
-    };
-    const openSearchDialog = () => {
-        console.log("Search dialog opened");
-    }
+  const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(false);
+  const [isSearch, setIsSearch] = useState(false);
+  const [isNewGroup, setIsNewGroup] = useState(false);
+  const [isNotification, setIsNotification] = useState(false);
+
+  const handleMobile = () => {
+    setIsMobile(!isMobile);
+  };
+  const openSearch = () => {
+    setIsSearch(!isSearch);
+    console.log("Search dialog opened");
+  };
+  const openNotification = () => {
+    setIsNotification(!isNotification);
+    console.log("Notification dialog opened");
+  };
+  const openNewGroup = () => {
+    setIsNewGroup(!isNewGroup);
+    console.log("New group dialog opened");
+  };
+  const navigateToGroup = () => navigate("/groups");
+  const logoutHandler = () => {
+    console.log("Logout clicked");
+    // Add your logout logic here
+  };
   return (
     <>
       <Box sx={{ flexGrow: 1 }} height="4rem">
@@ -24,19 +62,67 @@ const Header = () => {
 
             <Box sx={{ display: { xs: "block", sm: "none" } }}>
               <IconButton color="inherit" onClick={handleMobile}>
-                <MenuIcon/>
+                <MenuIcon />
               </IconButton>
             </Box>
             <Box sx={{ flexGrow: 1 }} />
             <Box>
-            <IconButton color="inherit" size="large" onClick={openSearchDialog}>
-                <SearchIcon/>
-              </IconButton>
+              <IconBtn
+                onClick={openSearch}
+                title="Search"
+                icon={<SearchIcon />}
+              />
+
+              <IconBtn
+                onClick={openNewGroup}
+                title="New Group"
+                icon={<AddIcon />}
+              />
+
+              <IconBtn
+                onClick={navigateToGroup}
+                title="Manage Groups"
+                icon={<GroupIcon />}
+              />
+              <IconBtn
+                onClick={openNotification}
+                title="Notifications"
+                icon={<NotificationsIcon />}
+              />
+              <IconBtn
+                onClick={logoutHandler}
+                title="Logout"
+                icon={<LogoutIcon />}
+              />
             </Box>
           </Toolbar>
         </AppBar>
       </Box>
+      {isSearch && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <SearchDialog open={isSearch} onClose={openSearch} />
+        </Suspense>
+      )}
+      {isNewGroup && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <NewGroupDialog open={isNewGroup} onClose={openNewGroup} />
+        </Suspense>
+      )}
+      {isNotification && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <NotificationsDialog open={isNotification} onClose={openNotification} />
+        </Suspense>
+      )}
     </>
+  );
+};
+const IconBtn = ({ onClick, title, icon }) => {
+  return (
+    <Tooltip title={title} arrow>
+      <IconButton color="inherit" size="large" onClick={onClick}>
+        {icon}
+      </IconButton>
+    </Tooltip>
   );
 };
 
