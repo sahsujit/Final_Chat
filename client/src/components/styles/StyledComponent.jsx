@@ -19,7 +19,7 @@ color: black;
 padding: 1rem;
 
 &:hover {
-  text-decoration: #f0f0f0;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 `

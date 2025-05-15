@@ -4,10 +4,21 @@ import Title from '../shared/Title';
 import { Grid } from '@mui/material';
 import ChatList from '../specific/ChatList';
 import { sampleChats } from '../../constants/sampleData';
+import { useParams } from 'react-router-dom';
+import Profile from '../specific/Profile';
 
 const AppLayout = (WrappedComponent) => {
-  return (props) => (
-    <>
+ 
+  return (props) => {
+    const params = useParams();
+    const { chatId } = params;
+    const handleDeleteChat = (chatId) => {
+      console.log("Delete chat with id: ", chatId);
+      // Add your delete chat logic here
+    }
+    
+    return(
+      <>
       <Title />
       <Header />
       <Grid container 
@@ -21,7 +32,7 @@ const AppLayout = (WrappedComponent) => {
           sx={{ display: { xs: 'none', sm: 'block' } }}
           height="100%"
         >
-         <ChatList chats={sampleChats} chatId={"1"} newMessagesAlert={[
+         <ChatList chats={sampleChats} chatId={chatId} handleDeleteChat={handleDeleteChat} newMessagesAlert={[
           {
             chatId:"1",
             count:4
@@ -43,14 +54,22 @@ const AppLayout = (WrappedComponent) => {
         <Grid
           size={{ lg: 3, md: 4 }}
          
-          sx={{ display: { xs: 'none', md: 'block' } }}
-          height="100%"
+          sx={{
+            display: { xs: "none", md: "block" },
+            padding: "2rem",
+            bgcolor: "rgba(0,0,0,0.85)",
+          }}
+          height={"100%"}
         >
-          Third
+          <Profile/>
         </Grid>
       </Grid>
     </>
-  );
+    )
+  }
+    
+    
+ ;
 };
 
 export default AppLayout;

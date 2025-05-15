@@ -3,7 +3,7 @@ import React from 'react'
 import ChatItem from '../shared/ChatItem'
 
 const ChatList = ({w="100%", chatId, chats=[],    handleDeleteChat,
-    onlineUsers=[], newMessagesAlert=[
+    onlineUsers=["1","2"],newMessagesAlert=[
     {
         chatId:"",
         count:0
@@ -27,7 +27,7 @@ const ChatList = ({w="100%", chatId, chats=[],    handleDeleteChat,
                     sameSender={chatId===_id}
                     index={index}
                     key={_id}
-                    handleDeleteChatOpen={handleDeleteChat}
+                    handleDeleteChat={handleDeleteChat}
 
                     />
                 )
