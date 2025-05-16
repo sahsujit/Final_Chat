@@ -2,11 +2,9 @@ import {
   Avatar,
   Button,
   Dialog,
-  DialogTitle,
   ListItem,
-  Skeleton,
   Stack,
-  Typography,
+  Typography
 } from "@mui/material";
 import React, { memo } from "react";
 import { sampleNotifications } from "../../constants/sampleData";
