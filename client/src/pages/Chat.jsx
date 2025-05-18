@@ -8,9 +8,18 @@ import {
   AttachFile as AttachFileIcon,
   Send as SendIcon,
 } from "@mui/icons-material";
+import FileMenu from '../components/dialogs/FileMenu';
+import { sampleMessage } from '../constants/sampleData';
+import MessageComponent from '../components/shared/MessageComponent';
+
+let user ={
+  _id: "skahdfg",
+  name: "John Doe",
+}
 
 const Chat = () => {
   const containerRef = useRef(null)
+  const fileMenuRef = useRef(null)
    
   return (
     <>
@@ -26,6 +35,11 @@ const Chat = () => {
         overflowY: "auto",
       }}
     >
+      {
+        sampleMessage.map((i, index)=>(
+          <MessageComponent key={index} user={user} message={i}/>
+        ))
+      }
       
     </Stack>
 
@@ -48,6 +62,7 @@ const Chat = () => {
             left: "1.5rem",
             rotate: "30deg",
           }}
+          ref={fileMenuRef}
           // onClick={handleFileOpen}
         >
           <AttachFileIcon />
@@ -76,6 +91,7 @@ const Chat = () => {
         </IconButton>
       </Stack>
     </form>
+    <FileMenu anchorE1={fileMenuRef.current}/>
 
     {/* <FileMenu anchorE1={fileMenuAnchor} chatId={chatId} /> */}
   </>
