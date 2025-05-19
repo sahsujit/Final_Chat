@@ -3,6 +3,7 @@ import React, { memo } from 'react'
 import { lightBlue } from "../../constants/color";
 import moment from 'moment';
 import { fileFormat } from '../../lib/features';
+import RenderAttachment from './RenderAttachment';
 
 
 const MessageComponent = ({message, user}) => {
@@ -45,7 +46,7 @@ const MessageComponent = ({message, user}) => {
                   color: "black",
                 }}
               >
-                {/* {RenderAttachment(file, url)} */}
+                {RenderAttachment(file, url)}
               </a>
             </Box>
           );

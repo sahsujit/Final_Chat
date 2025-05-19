@@ -65,9 +65,9 @@ export const sampleUsers = [
     {
       attachments: [],
       content: "L*uda ka Message hai",
-      _id: "sfnsdjkfsdnfkjsbnd",
+      _id: "sfnsdjkfsdnfkdddjsbndghfshdjhfgkghljklghlkjhkj",
       sender: {
-        _id: "user._id",
+        _id: "sdfsdfsdfgg",
         name: "Chaman ",
       },
       chat: "chatId",
@@ -82,7 +82,7 @@ export const sampleUsers = [
         },
       ],
       content: "",
-      _id: "sfnsdjkfsdnfkdddjsbnd",
+      _id: "sdfsdfsdf",
       sender: {
         _id: "sdfsdfsdf",
         name: "Chaman  2",

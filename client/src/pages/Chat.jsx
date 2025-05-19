@@ -13,7 +13,7 @@ import { sampleMessage } from '../constants/sampleData';
 import MessageComponent from '../components/shared/MessageComponent';
 
 let user ={
-  _id: "skahdfg",
+  _id: "sdfsdfsdf",
   name: "John Doe",
 }
 
@@ -30,6 +30,7 @@ const Chat = () => {
       spacing={"1rem"}
       bgcolor={grayColor}
       height={"90%"}
+      
       sx={{
         overflowX: "hidden",
         overflowY: "auto",
