@@ -3,6 +3,8 @@ import express from 'express';
 import userRoute from './routes/user.js';
 import connectDB from './utils/db.js';
 import dotenv from 'dotenv';
+import { errorMiddleware } from './middlewares/error.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
@@ -19,6 +21,7 @@ connectDB()
 
 
 app.use(express.json());
+app.use(cookieParser())
 app.use("/user", userRoute)
 
 app.get('/', (req, res) => {
@@ -28,6 +31,9 @@ app.get('/', (req, res) => {
 
 
 );
+
+
+app.use(errorMiddleware)
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 }
