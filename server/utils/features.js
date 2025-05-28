@@ -20,8 +20,12 @@ const sendToken = (res, user, code, message)=>{
     })
 }
 
+
+const deletFilesFromCloudinary = (public_ids) => {
+    
+}
 const emitEvent = (req,event, users,data ) =>{
     console.log("Emitting event: ", event);
 }
 
-export {sendToken, cookieOption, emitEvent}
+export {sendToken, cookieOption, emitEvent, deletFilesFromCloudinary}

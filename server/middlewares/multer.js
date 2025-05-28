@@ -8,3 +8,5 @@ const upload = multer({
 
 // Export a specific middleware (e.g., single file upload with field name "avatar")
 export const multerUpload = upload.single('avatar'); // change 'avatar' to match your frontend form field
+
+export const attachmentMulter = upload.array('files', 5)
