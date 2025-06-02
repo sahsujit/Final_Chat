@@ -9,6 +9,7 @@ import cookieParser from 'cookie-parser';
 
 import userRoute from './routes/user.js';
 import chatRoute from './routes/chat.js';
+import adminRoute from './routes/admin.js';
 
 
 const app = express();
@@ -33,6 +34,7 @@ app.use(cookieParser())
 
 app.use("/user", userRoute)
 app.use("/chat", chatRoute)
+app.use("/admin", adminRoute)
 
 
 
