@@ -12,7 +12,9 @@ import { Server } from "socket.io";
 import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
-import { NEW_MESSAGE } from "./constants/event.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/event.js";
+import { getSockets } from "./lib/helper.js";
+import { Message } from "./models/message.js";
 
 const app = express();
 const server = createServer(app);
@@ -51,7 +53,7 @@ io.on("connection", (socket) => {
     name:"Anon"
   }
 
-  userSocketIDs.set(user._id, socket.id);
+  userSocketIDs.set(user._id.toString(), socket.id);
   console.log("Connected to socket.io", socket.id);
 
 socket.on(NEW_MESSAGE, async({message, chatId, members})=>{
@@ -72,10 +74,27 @@ socket.on(NEW_MESSAGE, async({message, chatId, members})=>{
       sender: user._id,
       chat: chatId,
     };
+
+    const membersSocket = getSockets(members);
+    io.to(membersSocket).emit(NEW_MESSAGE,{
+      chatId,
+      message: messageForRealTime
+    })
+
+    io.to(membersSocket).emit(NEW_MESSAGE_ALERT,{
+      chatId
+    })
+
+    try {
+     await Message.create(messageForDB);
+    } catch (error) {
+      throw new Error(error);
+    }
 })
 
   socket.on("disconnect", () => {
     console.log("Disconnected from socket.io");
+  userSocketIDs.delete(user._id.toString());
   });
 });
 
