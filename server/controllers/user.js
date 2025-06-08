@@ -1,6 +1,6 @@
 import { compare } from "bcrypt";
 import { User } from "../models/user.js";
-import { cookieOption, emitEvent, sendToken } from "../utils/features.js";
+import { cookieOption, emitEvent, sendToken, uploadFilesToCloudinary } from "../utils/features.js";
 import { Error } from "mongoose";
 import { TryCatch } from "../middlewares/error.js";
 import { ErrorHandler } from "../utils/utility.js";
@@ -14,6 +14,8 @@ const newUser = TryCatch(async (req, res, next) => {
   const file = req.file;
 
   if (!file) return next(new ErrorHandler("Please Upload Avatar", 404));
+
+  const result = await uploadFilesToCloudinary([file]);
 
   const avatar = {
     public_id: "kdsjfgfoh",

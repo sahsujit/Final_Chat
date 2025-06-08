@@ -5,7 +5,9 @@ import { errorMiddleware } from "./middlewares/error.js";
 import cookieParser from "cookie-parser";
 import { createServer } from "http";
 import { v4 as uuid } from "uuid";
+import cors from "cors";
 
+import { v2 as cloudinary } from "cloudinary";
 
 import { Server } from "socket.io";
 
@@ -15,6 +17,7 @@ import adminRoute from "./routes/admin.js";
 import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/event.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
+import { corsOptions } from "./constants/config.js";
 
 const app = express();
 const server = createServer(app);
@@ -32,13 +35,19 @@ const userSocketIDs = new Map();
 
 
 connectDB();
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors(corsOptions))
 
-app.use("/user", userRoute);
-app.use("/chat", chatRoute);
-app.use("/admin", adminRoute);
+app.use("/api/v1/user", userRoute);
+app.use("/api/v1/chat", chatRoute);
+app.use("/api/v1/admin", adminRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -88,7 +97,7 @@ socket.on(NEW_MESSAGE, async({message, chatId, members})=>{
     try {
      await Message.create(messageForDB);
     } catch (error) {
-      throw new Error(error);
+      throw new Error(error)
     }
 })
 
