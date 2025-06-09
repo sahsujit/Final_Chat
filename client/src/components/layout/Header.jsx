@@ -18,36 +18,48 @@ import {
   Search as SearchIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-const  SearchDialog =lazy(()=>import("../specific/Search")) ;
+import axios from "axios";
+import { server } from "../../constants/config";
+import toast from "react-hot-toast";
+import { userNotExists } from "../../redux/reducers/auth";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setIsMobile,
+  setIsNewGroup,
+  setIsNotification,
+  setIsSearch,
+} from "../../redux/reducers/misc";
+const SearchDialog = lazy(() => import("../specific/Search"));
 const NewGroupDialog = lazy(() => import("../specific/NewGroup"));
 const NotificationsDialog = lazy(() => import("../specific/Notifications"));
 
 const Header = () => {
   const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(false);
-  const [isSearch, setIsSearch] = useState(false);
-  const [isNewGroup, setIsNewGroup] = useState(false);
-  const [isNotification, setIsNotification] = useState(false);
+  const { isSearch, isNotification, isNewGroup } = useSelector(
+    (state) => state.misc
+  );
 
-  const handleMobile = () => {
-    setIsMobile(!isMobile);
-  };
-  const openSearch = () => {
-    setIsSearch(!isSearch);
-    console.log("Search dialog opened");
-  };
-  const openNotification = () => {
-    setIsNotification(!isNotification);
-    console.log("Notification dialog opened");
-  };
+  const dispatch = useDispatch();
+  const handleMobile = () => dispatch(setIsMobile(true));
+  const openSearch = () => dispatch(setIsSearch(true));
   const openNewGroup = () => {
-    setIsNewGroup(!isNewGroup);
-    console.log("New group dialog opened");
+    dispatch(setIsNewGroup(true));
+  };
+
+  const openNotification = () => {
+    dispatch(setIsNotification(true));
   };
   const navigateToGroup = () => navigate("/groups");
-  const logoutHandler = () => {
-    console.log("Logout clicked");
-    // Add your logout logic here
+  const logoutHandler = async () => {
+    try {
+      const { data } = await axios.get(`${server}/api/v1/user/logout`, {
+        withCredentials: true,
+      });
+      dispatch(userNotExists());
+      toast.success(data.message);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    }
   };
   return (
     <>
@@ -100,18 +112,20 @@ const Header = () => {
         </AppBar>
       </Box>
       {isSearch && (
-         <Suspense fallback={<Backdrop open/>}>
-          <SearchDialog open={isSearch} onClose={openSearch} />
+        <Suspense fallback={<Backdrop open />}>
+          <SearchDialog  />
         </Suspense>
       )}
       {isNewGroup && (
-        <Suspense fallback={<Backdrop open/>}>
-          <NewGroupDialog open={isNewGroup} onClose={openNewGroup} />
+        <Suspense fallback={<Backdrop open />}>
+          <NewGroupDialog  />
         </Suspense>
       )}
       {isNotification && (
-         <Suspense fallback={<Backdrop open/>}>
-          <NotificationsDialog open={isNotification} onClose={openNotification} />
+        <Suspense fallback={<Backdrop open />}>
+          <NotificationsDialog
+           
+          />
         </Suspense>
       )}
     </>
