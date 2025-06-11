@@ -10,17 +10,23 @@ import { useMyChatsQuery } from "../../redux/api/api";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsMobile } from "../../redux/reducers/misc";
 import { useErrors } from "../../hooks/hook";
+import { getSocket } from "../../socket";
 
 const AppLayout = (WrappedComponent) => {
   return (props) => {
     const params = useParams();
     const { chatId } = params;
 
+    const socket = getSocket();
+    console.log(socket);
+
     const dispatch = useDispatch();
 
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
     useErrors([{ isError, error }]);
     const { isMobile } = useSelector((state) => state.misc);
+        const { user } = useSelector((state) => state.auth);
+
     const handleDeleteChat = (chatId) => {
       console.log("Delete chat with id: ", chatId);
       // Add your delete chat logic here
@@ -89,7 +95,7 @@ const AppLayout = (WrappedComponent) => {
             }}
             height={"100%"}
           >
-            <Profile />
+            <Profile user={user} />
           </Grid>
         </Grid>
       </>

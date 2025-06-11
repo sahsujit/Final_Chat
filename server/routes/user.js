@@ -45,7 +45,7 @@ router.put(
 );
 
 router.put(
-  " /acceptrequest",
+  "/acceptrequest",
   acceptRequestValidator(),
   validateHandler,
   acceptFriendRequest

@@ -24,7 +24,7 @@ const Search = () => {
   const dispatch = useDispatch();
   const [searchUser] = useLazySearchUserQuery();
 
-  const [sendFriendRequest] = useAsyncMutation(useSendFriendRequestMutation)
+  const [sendFriendRequest , isLoadingSendFriendRequest] = useAsyncMutation(useSendFriendRequestMutation)
 
   const addFriendHandler = async(id) => {
    await sendFriendRequest("Sending friend request...", { userId: id });
@@ -41,7 +41,6 @@ const Search = () => {
   });
 
   const searchCloseHandler = () => dispatch(setIsSearch(false));
-  let isLoadingSendFriendRequest = false;
   return (
     <Dialog open={isSearch} onClose={searchCloseHandler}>
       <Stack p={"2rem"} direction={"column"} width={"25rem"}>

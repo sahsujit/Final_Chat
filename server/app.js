@@ -18,10 +18,11 @@ import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/event.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
+import { socketAuthenticator } from "./middlewares/auth.js";
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, {});
+const io = new Server(server, {cors:corsOptions});
 
 dotenv.config({
   path: "./.env",
@@ -55,12 +56,17 @@ app.get("/", (req, res) => {
 
 app.use(errorMiddleware);
 
+io.use((socket, next)=>{
+  cookieParser()(
+    socket.request,
+    socket.request.res,
+    async(err)=>await socketAuthenticator(err, socket, next)
+  )
+})
+
 io.on("connection", (socket) => {
 
-  const user = {
-    _id:"abcdefgh",
-    name:"Anon"
-  }
+  const user = socket.user
 
   userSocketIDs.set(user._id.toString(), socket.id);
   console.log("Connected to socket.io", socket.id);
