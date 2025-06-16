@@ -6,7 +6,7 @@ import { User } from "../models/user.js";
 import { Message } from "../models/message.js";
 
 
-import { deletFilesFromCloudinary, emitEvent } from "../utils/features.js";
+import { deletFilesFromCloudinary, emitEvent, uploadFilesToCloudinary } from "../utils/features.js";
 import { ErrorHandler } from "../utils/utility.js";
 
 const newGroupChat = TryCatch(async (req, res, next) => {
@@ -234,7 +234,7 @@ const sendAttachment = TryCatch(async (req, res, next) => {
     return next(new ErrorHandler("Please provide attachments", 400));
 
 
-  const attachments = [];
+  const attachments = await uploadFilesToCloudinary(files);
 
 
   const messageForDB = {

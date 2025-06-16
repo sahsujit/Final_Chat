@@ -14,9 +14,12 @@ import MessageComponent from "../components/shared/MessageComponent";
 import { getSocket } from "../socket";
 import { useState } from "react";
 import { NEW_MESSAGE } from "../constants/events";
-import { useChatDetailsQuery } from "../redux/api/api";
+import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
 import { useErrors, useSocketEvents } from "../hooks/hook";
 import { useCallback } from "react";
+import { useInfiniteScrollTop } from "6pp";
+import { useDispatch } from "react-redux";
+import { setIsFileMenu } from "../redux/reducers/misc";
 
 
 
@@ -24,18 +27,40 @@ const Chat = ({ chatId, user }) => {
   const containerRef = useRef(null);
   const fileMenuRef = useRef(null);
 
+  const dispatch = useDispatch()
   const socket = getSocket();
   const [message, setMessage] = useState("");
     const [messages, setMessages] = useState([]);
+    const [page, setPage] = useState(1);
+      const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
+
 
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
   const members = chatDetails?.data?.chat?.members;
 
+  const oldMessagesChunk = useGetMessagesQuery({chatId, page})
+
+  const {data: oldMessages, setData: setOldMessages} = useInfiniteScrollTop(
+     containerRef,
+    oldMessagesChunk.data?.totalPages,
+    page,
+    setPage,
+    oldMessagesChunk.data?.messages
+  )
+
 
     const errors = [
     { isError: chatDetails.isError, error: chatDetails.error },
-    // { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error },
+    { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error },
   ];
+
+
+
+  const handleFileOpen = (e) => {
+    dispatch(setIsFileMenu(true))
+    setFileMenuAnchor(e.currentTarget)
+    
+  }
   const submitHandler = (e) => {
     e.preventDefault();
     if (!message.trim()) return;
@@ -60,6 +85,9 @@ const Chat = ({ chatId, user }) => {
 
   useErrors(errors);
 
+  
+  const allMessages = [...oldMessages, ...messages];
+
   const messageOnChange = (e) => {
     setMessage(e.target.value);
   };
@@ -79,7 +107,7 @@ const Chat = ({ chatId, user }) => {
           overflowY: "auto",
         }}
       >
-        {messages.map((i, index) => (
+        {allMessages.map((i, index) => (
           <MessageComponent key={index} user={user} message={i} />
         ))}
       </Stack>
@@ -104,7 +132,7 @@ const Chat = ({ chatId, user }) => {
               rotate: "30deg",
             }}
             ref={fileMenuRef}
-            // onClick={handleFileOpen}
+            onClick={handleFileOpen}
           >
             <AttachFileIcon />
           </IconButton>
@@ -132,9 +160,8 @@ const Chat = ({ chatId, user }) => {
           </IconButton>
         </Stack>
       </form>
-      <FileMenu anchorE1={fileMenuRef.current} />
 
-      {/* <FileMenu anchorE1={fileMenuAnchor} chatId={chatId} /> */}
+       <FileMenu anchorE1={fileMenuAnchor} chatId={chatId} />
     </>
   );
 };
