@@ -38,15 +38,15 @@ const Chat = ({ chatId, user }) => {
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
   const members = chatDetails?.data?.chat?.members;
 
-  const oldMessagesChunk = useGetMessagesQuery({chatId, page})
+  const oldMessagesChunk = useGetMessagesQuery({ chatId, page });
 
-  const {data: oldMessages, setData: setOldMessages} = useInfiniteScrollTop(
-     containerRef,
+  const { data: oldMessages, setData: setOldMessages } = useInfiniteScrollTop(
+    containerRef,
     oldMessagesChunk.data?.totalPages,
     page,
     setPage,
     oldMessagesChunk.data?.messages
-  )
+  );
 
 
     const errors = [
@@ -54,6 +54,11 @@ const Chat = ({ chatId, user }) => {
     { isError: oldMessagesChunk.isError, error: oldMessagesChunk.error },
   ];
 
+
+
+   const messageOnChange = (e) => {
+    setMessage(e.target.value);
+  };
 
 
   const handleFileOpen = (e) => {
@@ -85,12 +90,11 @@ const Chat = ({ chatId, user }) => {
 
   useErrors(errors);
 
+
   
   const allMessages = [...oldMessages, ...messages];
 
-  const messageOnChange = (e) => {
-    setMessage(e.target.value);
-  };
+ 
   return chatDetails.isLoading ? (
     <Skeleton />
   ) : (
@@ -107,8 +111,8 @@ const Chat = ({ chatId, user }) => {
           overflowY: "auto",
         }}
       >
-        {allMessages.map((i, index) => (
-          <MessageComponent key={index} user={user} message={i} />
+        {allMessages.map((i) => (
+          <MessageComponent key={i._id} user={user} message={i} />
         ))}
       </Stack>
 

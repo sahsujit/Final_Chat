@@ -1,12 +1,17 @@
-import multer from 'multer';
 
-const upload = multer({
+
+
+
+import multer from "multer";
+
+const multerUpload = multer({
   limits: {
-    fileSize: 1024 * 1024 * 5 // 5 MB
-  }
+    fileSize: 1024 * 1024 * 5,
+  },
 });
 
-// Export a specific middleware (e.g., single file upload with field name "avatar")
-export const multerUpload = upload.single('avatar'); // change 'avatar' to match your frontend form field
+const singleAvatar = multerUpload.single("avatar");
 
-export const attachmentMulter = upload.array('files', 5)
+const attachmentsMulter = multerUpload.array("files", 5);
+
+export { singleAvatar, attachmentsMulter };

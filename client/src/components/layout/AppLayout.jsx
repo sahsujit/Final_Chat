@@ -1,16 +1,21 @@
-import React from "react";
-import Header from "./Header";
-import Title from "../shared/Title";
 import { Drawer, Grid, Skeleton } from "@mui/material";
-import ChatList from "../specific/ChatList";
-import { sampleChats } from "../../constants/sampleData";
-import { useParams } from "react-router-dom";
-import Profile from "../specific/Profile";
-import { useMyChatsQuery } from "../../redux/api/api";
 import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import {
+  NEW_MESSAGE_ALERT,
+  NEW_REQUEST,
+  ONLINE_USERS,
+  REFETCH_CHATS,
+} from "../../constants/events";
+import { useErrors, useSocketEvents } from "../../hooks/hook";
+import { useMyChatsQuery } from "../../redux/api/api";
 import { setIsMobile } from "../../redux/reducers/misc";
-import { useErrors } from "../../hooks/hook";
 import { getSocket } from "../../socket";
+import Title from "../shared/Title";
+import ChatList from "../specific/ChatList";
+import Profile from "../specific/Profile";
+import Header from "./Header";
+import { useCallback } from "react";
 
 const AppLayout = (WrappedComponent) => {
   return (props) => {
@@ -32,6 +37,38 @@ const AppLayout = (WrappedComponent) => {
       // Add your delete chat logic here
     };
     const handleMobileClose = () => dispatch(setIsMobile(false));
+
+    const newMessageAlertListener = useCallback((data)=>{
+      if(data.chatId === chatId) return;
+      // dispatch(setNewMessageAlert(data))
+    },[chatId])
+    
+
+
+    const newRequestListener = useCallback(()=>{
+
+    },[])
+
+    const refetchListener = useCallback(()=>{
+      refetch()
+    },[])
+
+    const onlineUsersListener = useCallback((data)=>{
+      // dispatch(setOnlineUsers(data))
+    },[])
+
+
+
+
+
+      const eventHandlers = {
+      [NEW_MESSAGE_ALERT]: newMessageAlertListener,
+      [NEW_REQUEST]: newRequestListener,
+      [REFETCH_CHATS]: refetchListener,
+      [ONLINE_USERS]: onlineUsersListener,
+    };
+
+    useSocketEvents(socket, eventHandlers);
 
     return (
       <>

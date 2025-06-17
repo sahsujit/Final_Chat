@@ -1,4 +1,7 @@
-import { ALERT, REFETCH_CHATS } from "../constants/event.js";
+import {   ALERT,
+  NEW_MESSAGE,
+  NEW_MESSAGE_ALERT,
+  REFETCH_CHATS, } from "../constants/event.js";
 import { getOtherMembers } from "../lib/helper.js";
 import { TryCatch } from "../middlewares/error.js";
 import { Chat } from "../models/chat.js";
@@ -208,10 +211,11 @@ const leaveGroup = TryCatch(async (req, res, next) => {
   });
 });
 
-const sendAttachment = TryCatch(async (req, res, next) => {
+
+
+const sendAttachments = TryCatch(async (req, res, next) => {
   const { chatId } = req.body;
 
-  
   const files = req.files || [];
 
   if (files.length < 1)
@@ -220,22 +224,18 @@ const sendAttachment = TryCatch(async (req, res, next) => {
   if (files.length > 5)
     return next(new ErrorHandler("Files Can't be more than 5", 400));
 
-
   const [chat, me] = await Promise.all([
     Chat.findById(chatId),
-    User.findById(req.user, "name")
-  ])
+    User.findById(req.user, "name"),
+  ]);
 
-
-  
   if (!chat) return next(new ErrorHandler("Chat not found", 404));
 
   if (files.length < 1)
     return next(new ErrorHandler("Please provide attachments", 400));
 
-
+  //   Upload files here
   const attachments = await uploadFilesToCloudinary(files);
-
 
   const messageForDB = {
     content: "",
@@ -252,7 +252,6 @@ const sendAttachment = TryCatch(async (req, res, next) => {
     },
   };
 
-
   const message = await Message.create(messageForDB);
 
   emitEvent(req, NEW_MESSAGE, chat.members, {
@@ -267,6 +266,7 @@ const sendAttachment = TryCatch(async (req, res, next) => {
     message,
   });
 });
+
 
 const getChatDetails = TryCatch(async (req, res, next) => {
   if (req.query.populate === "true") {
@@ -416,7 +416,7 @@ export {
   addMembers,
   removeMembers,
   leaveGroup,
-  sendAttachment,
+  sendAttachments,
   getChatDetails,
   renameGroup,
   deleteChat,

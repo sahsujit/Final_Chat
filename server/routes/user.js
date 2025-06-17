@@ -10,7 +10,7 @@ import {
   getMyNotifications,
   getMyFriends
 } from "../controllers/user.js";
-import { multerUpload } from "../middlewares/multer.js";
+import { singleAvatar } from "../middlewares/multer.js";
 import { isAuthenticated } from "../middlewares/auth.js";
 import {
   acceptRequestValidator,
@@ -23,7 +23,7 @@ const router = express.Router();
 
 router.post(
   "/new",
-  multerUpload,
+  singleAvatar,
   registerValidator(),
   validateHandler,
   newUser
