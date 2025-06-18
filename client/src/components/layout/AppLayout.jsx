@@ -1,4 +1,5 @@
 import { Drawer, Grid, Skeleton } from "@mui/material";
+import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
@@ -9,13 +10,16 @@ import {
 } from "../../constants/events";
 import { useErrors, useSocketEvents } from "../../hooks/hook";
 import { useMyChatsQuery } from "../../redux/api/api";
+import {
+  incrementNotification,
+  setNewMessageAlert,
+} from "../../redux/reducers/chat";
 import { setIsMobile } from "../../redux/reducers/misc";
 import { getSocket } from "../../socket";
 import Title from "../shared/Title";
 import ChatList from "../specific/ChatList";
 import Profile from "../specific/Profile";
 import Header from "./Header";
-import { useCallback } from "react";
 
 const AppLayout = (WrappedComponent) => {
   return (props) => {
@@ -30,7 +34,9 @@ const AppLayout = (WrappedComponent) => {
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
     useErrors([{ isError, error }]);
     const { isMobile } = useSelector((state) => state.misc);
-        const { user } = useSelector((state) => state.auth);
+    const { user } = useSelector((state) => state.auth);
+
+    const { newMessagesAlert } = useSelector((state) => state.chat);
 
     const handleDeleteChat = (chatId) => {
       console.log("Delete chat with id: ", chatId);
@@ -38,30 +44,27 @@ const AppLayout = (WrappedComponent) => {
     };
     const handleMobileClose = () => dispatch(setIsMobile(false));
 
-    const newMessageAlertListener = useCallback((data)=>{
-      if(data.chatId === chatId) return;
-      // dispatch(setNewMessageAlert(data))
-    },[chatId])
-    
+    const newMessageAlertListener = useCallback(
+      (data) => {
+        if (data.chatId === chatId) return;
+        dispatch(setNewMessageAlert(data));
+      },
+      [chatId]
+    );
 
+    const newRequestListener = useCallback(() => {
+      dispatch(incrementNotification());
+    }, [dispatch]);
 
-    const newRequestListener = useCallback(()=>{
+    const refetchListener = useCallback(() => {
+      refetch();
+    }, []);
 
-    },[])
-
-    const refetchListener = useCallback(()=>{
-      refetch()
-    },[])
-
-    const onlineUsersListener = useCallback((data)=>{
+    const onlineUsersListener = useCallback((data) => {
       // dispatch(setOnlineUsers(data))
-    },[])
+    }, []);
 
-
-
-
-
-      const eventHandlers = {
+    const eventHandlers = {
       [NEW_MESSAGE_ALERT]: newMessageAlertListener,
       [NEW_REQUEST]: newRequestListener,
       [REFETCH_CHATS]: refetchListener,
@@ -84,7 +87,7 @@ const AppLayout = (WrappedComponent) => {
               chats={data?.chats}
               chatId={chatId}
               // handleDeleteChat={handleDeleteChat}
-              // newMessagesAlert={newMessagesAlert}
+              newMessagesAlert={newMessagesAlert}
               // onlineUsers={onlineUsers}
             />
           </Drawer>
@@ -103,12 +106,7 @@ const AppLayout = (WrappedComponent) => {
                 chats={data?.chats}
                 chatId={chatId}
                 handleDeleteChat={handleDeleteChat}
-                newMessagesAlert={[
-                  {
-                    chatId: "1",
-                    count: 4,
-                  },
-                ]}
+                newMessagesAlert={newMessagesAlert}
               />
             )}
           </Grid>
@@ -119,7 +117,7 @@ const AppLayout = (WrappedComponent) => {
             height="100%"
             bgcolor="primary.main"
           >
-            <WrappedComponent {...props} chatId={chatId} user ={user} />
+            <WrappedComponent {...props} chatId={chatId} user={user} />
           </Grid>
 
           {/* Right sidebar */}
