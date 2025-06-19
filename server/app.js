@@ -14,7 +14,7 @@ import { Server } from "socket.io";
 import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/event.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from "./constants/event.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
@@ -107,6 +107,15 @@ socket.on(NEW_MESSAGE, async({message, chatId, members})=>{
       throw new Error(error)
     }
 })
+
+ socket.on(START_TYPING,({chatId, members})=>{
+  const membersSocket = getSockets(members)
+  socket.to(membersSocket).emit(START_TYPING,{chatId})
+ })
+ socket.on(STOP_TYPING,({chatId, members})=>{
+  const membersSocket = getSockets(members)
+  socket.to(membersSocket).emit(STOP_TYPING,{chatId})
+ })
 
   socket.on("disconnect", () => {
     console.log("Disconnected from socket.io");

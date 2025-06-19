@@ -20,6 +20,8 @@ import Title from "../shared/Title";
 import ChatList from "../specific/ChatList";
 import Profile from "../specific/Profile";
 import Header from "./Header";
+import { useEffect } from "react";
+import { getOrSaveFromStorage } from "../../lib/features";
 
 const AppLayout = (WrappedComponent) => {
   return (props) => {
@@ -33,10 +35,16 @@ const AppLayout = (WrappedComponent) => {
 
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
     useErrors([{ isError, error }]);
+    const { newMessagesAlert } = useSelector((state) => state.chat);
+
+
+    useEffect(()=>{
+      getOrSaveFromStorage({key:NEW_MESSAGE_ALERT,value:newMessagesAlert})
+    },[newMessagesAlert])
+
     const { isMobile } = useSelector((state) => state.misc);
     const { user } = useSelector((state) => state.auth);
 
-    const { newMessagesAlert } = useSelector((state) => state.chat);
 
     const handleDeleteChat = (chatId) => {
       console.log("Delete chat with id: ", chatId);

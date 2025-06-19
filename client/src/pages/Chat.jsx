@@ -1,25 +1,25 @@
-import React, { useEffect, useRef } from "react";
-import AppLayout from "../components/layout/AppLayout";
 import { IconButton, Skeleton, Stack } from "@mui/material";
-import { grayColor, orange } from "../constants/color";
+import { useEffect, useRef } from "react";
+import AppLayout from "../components/layout/AppLayout";
 import { InputBox } from "../components/styles/StyledComponent";
+import { grayColor, orange } from "../constants/color";
 
+import { useInfiniteScrollTop } from "6pp";
 import {
   AttachFile as AttachFileIcon,
   Send as SendIcon,
 } from "@mui/icons-material";
-import FileMenu from "../components/dialogs/FileMenu";
-import { sampleMessage } from "../constants/sampleData";
-import MessageComponent from "../components/shared/MessageComponent";
-import { getSocket } from "../socket";
-import { useState } from "react";
-import { NEW_MESSAGE } from "../constants/events";
-import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
-import { useErrors, useSocketEvents } from "../hooks/hook";
-import { useCallback } from "react";
-import { useInfiniteScrollTop } from "6pp";
+import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
+import FileMenu from "../components/dialogs/FileMenu";
+import MessageComponent from "../components/shared/MessageComponent";
+import { NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../constants/events";
+import { useErrors, useSocketEvents } from "../hooks/hook";
+import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
+import { removeNewMessagesAlert } from "../redux/reducers/chat";
 import { setIsFileMenu } from "../redux/reducers/misc";
+import { getSocket } from "../socket";
+import { TypingLoader } from "../components/layout/Loader";
 
 const Chat = ({ chatId, user }) => {
   const containerRef = useRef(null);
@@ -31,6 +31,10 @@ const Chat = ({ chatId, user }) => {
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
+   const [IamTyping, setIamTyping] = useState(false);
+  const [userTyping, setUserTyping] = useState(false);
+  const typingTimeout = useRef(null);
+  const bottomRef = useRef(null);
 
   const chatDetails = useChatDetailsQuery({ chatId, skip: !chatId });
   const members = chatDetails?.data?.chat?.members;
@@ -52,6 +56,20 @@ const Chat = ({ chatId, user }) => {
 
   const messageOnChange = (e) => {
     setMessage(e.target.value);
+
+    if(!IamTyping){
+    socket.emit(START_TYPING, { chatId, members });
+    setIamTyping(true)
+
+    }
+
+    if (typingTimeout.current) clearTimeout(typingTimeout.current);
+
+    typingTimeout.current = setTimeout(() => {
+      socket.emit(STOP_TYPING, { chatId, members });
+      setIamTyping(false)
+    }, 2000);
+
   };
 
   const handleFileOpen = (e) => {
@@ -67,6 +85,7 @@ const Chat = ({ chatId, user }) => {
   };
 
   useEffect(() => {
+dispatch(removeNewMessagesAlert({ chatId }))
     return () => {
       setMessages([]);
       setMessage("");
@@ -74,6 +93,12 @@ const Chat = ({ chatId, user }) => {
       setPage(1);
     };
   }, [chatId]);
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   const newMessagesListener = useCallback(
     (data) => {
@@ -84,8 +109,21 @@ const Chat = ({ chatId, user }) => {
     [chatId]
   );
 
+  const startTypingListener = useCallback((data)=>{
+    if(data.chatId !== chatId) return;
+    setUserTyping(true)
+  },[chatId])
+
+  const stopTypingListener = useCallback((data)=>{
+    if(data.chatId !== chatId) return
+    setUserTyping(false)
+  },[chatId])
+
+
   const eventHandler = {
     [NEW_MESSAGE]: newMessagesListener,
+    [START_TYPING]: startTypingListener,
+    [STOP_TYPING]: stopTypingListener
   };
 
   useSocketEvents(socket, eventHandler);
@@ -113,6 +151,11 @@ const Chat = ({ chatId, user }) => {
         {allMessages.map((i) => (
           <MessageComponent key={i._id} user={user} message={i} />
         ))}
+
+        {userTyping && <TypingLoader/>}
+
+        <div ref={bottomRef}></div>
+
       </Stack>
 
       <form
