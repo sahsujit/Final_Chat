@@ -1,7 +1,7 @@
 import { Drawer, Grid, Skeleton } from "@mui/material";
 import { useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   NEW_MESSAGE_ALERT,
   NEW_REQUEST,
@@ -32,6 +32,7 @@ const AppLayout = (WrappedComponent) => {
     console.log(socket);
 
     const dispatch = useDispatch();
+    const navigate = useNavigate()
 
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
     useErrors([{ isError, error }]);
@@ -66,7 +67,8 @@ const AppLayout = (WrappedComponent) => {
 
     const refetchListener = useCallback(() => {
       refetch();
-    }, []);
+      navigate("/")
+    }, [refetch,navigate]);
 
     const onlineUsersListener = useCallback((data) => {
       // dispatch(setOnlineUsers(data))
