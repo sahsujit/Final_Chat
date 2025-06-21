@@ -31,7 +31,7 @@ router.get("/my", getMyChats);
 router.get("/my/groups", getMyGroups);
 router.put("/addmembers", addMemberValidator(), validateHandler, addMembers);
 router.put(
-  "/removemembers",
+  "/removemember",
   removeMemberValidator(),
   validateHandler,
   removeMembers

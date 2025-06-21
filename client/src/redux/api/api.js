@@ -63,6 +63,22 @@ const api = createApi({
       providesTags: ["Chat"],
     }),
 
+
+//     chatDetails: builder.query({
+//   query: ({ chatId, populate = false } = {}) => {
+//     if (!chatId) throw new Error("chatId is required");
+
+//     let url = `chat/${chatId}`;
+//     if (populate) url += "?populate=true";
+
+//     return {
+//       url,
+//       credentials: "include",
+//     };
+//   },
+//   providesTags: ["Chat"],
+// }),
+
     getMessages: builder.query({
       query: ({ chatId, page }) => ({
         url: `chat/message/${chatId}?page=${page}`,
@@ -132,6 +148,25 @@ const api = createApi({
       }),
       invalidatesTags: ["Chat"],
     }),
+
+
+    removeGroupMember: builder.mutation({
+  query: (body = {}) => {
+    const { chatId, userId } = body;
+
+    if (!chatId || !userId) {
+      throw new Error("chatId and userId are required");
+    }
+
+    return {
+      url: `chat/removemember`,
+      method: "PUT",
+      credentials: "include",
+      body: { chatId, userId },
+    };
+  },
+  invalidatesTags: ["Chat"],
+}),
 
     addGroupMembers: builder.mutation({
       query: ({ members, chatId }) => ({
