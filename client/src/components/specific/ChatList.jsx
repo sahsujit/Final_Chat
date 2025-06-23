@@ -68,10 +68,9 @@ const ChatList = ({
         const { avatar, _id, groupChat, name, members } = data;
 
         // Safe find with null check
-        const newMessageAlert =
-          newMessagesAlert.find(
-            (item) => item && item.chatId === _id
-          ) || { chatId: _id, count: 0 };
+     const newMessageAlert = newMessagesAlert.find(
+          ({ chatId }) => chatId === _id
+        );
 
         // Determine online status based on member ids, not _id
         const isOnline = Array.isArray(members)

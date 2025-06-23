@@ -14,6 +14,7 @@ const sendToken = (res, user, code, message) => {
 
   return res.status(code).cookie("chattu-token", token, cookieOption).json({
     success: true,
+    user,
     message,
   });
 };

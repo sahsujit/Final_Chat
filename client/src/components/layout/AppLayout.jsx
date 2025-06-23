@@ -1,5 +1,5 @@
 import { Drawer, Grid, Skeleton } from "@mui/material";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import {
@@ -14,7 +14,7 @@ import {
   incrementNotification,
   setNewMessageAlert,
 } from "../../redux/reducers/chat";
-import { setIsMobile } from "../../redux/reducers/misc";
+import { setIsDeleteMenu, setIsMobile, setSelectedDeleteChat } from "../../redux/reducers/misc";
 import { getSocket } from "../../socket";
 import Title from "../shared/Title";
 import ChatList from "../specific/ChatList";
@@ -22,6 +22,7 @@ import Profile from "../specific/Profile";
 import Header from "./Header";
 import { useEffect } from "react";
 import { getOrSaveFromStorage } from "../../lib/features";
+import DeleteChatMenu from "../dialogs/DeleteChatMenu";
 
 const AppLayout = (WrappedComponent) => {
   return (props) => {
@@ -33,6 +34,7 @@ const AppLayout = (WrappedComponent) => {
 
     const dispatch = useDispatch();
     const navigate = useNavigate()
+    const deleteMenuAnchor = useRef(null)
 
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
     useErrors([{ isError, error }]);
@@ -47,9 +49,10 @@ const AppLayout = (WrappedComponent) => {
     const { user } = useSelector((state) => state.auth);
 
 
-    const handleDeleteChat = (chatId) => {
-      console.log("Delete chat with id: ", chatId);
-      // Add your delete chat logic here
+    const handleDeleteChat = (e, chatId, groupChat) => {
+     dispatch(setIsDeleteMenu(true))
+         dispatch(setSelectedDeleteChat({ chatId, groupChat }));
+        deleteMenuAnchor.current = e.currentTarget;
     };
     const handleMobileClose = () => dispatch(setIsMobile(false));
 
@@ -87,6 +90,11 @@ const AppLayout = (WrappedComponent) => {
       <>
         <Title />
         <Header />
+
+        <DeleteChatMenu
+        dispatch={dispatch}
+        deleteMenuAnchor={deleteMenuAnchor}
+        />
 
         {isLoading ? (
           <Skeleton />

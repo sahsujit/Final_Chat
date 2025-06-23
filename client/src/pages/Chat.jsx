@@ -13,25 +13,31 @@ import { useCallback, useState } from "react";
 import { useDispatch } from "react-redux";
 import FileMenu from "../components/dialogs/FileMenu";
 import MessageComponent from "../components/shared/MessageComponent";
-import { ALERT, NEW_MESSAGE, START_TYPING, STOP_TYPING } from "../constants/events";
+import {
+  ALERT,
+  NEW_MESSAGE,
+  START_TYPING,
+  STOP_TYPING,
+} from "../constants/events";
 import { useErrors, useSocketEvents } from "../hooks/hook";
 import { useChatDetailsQuery, useGetMessagesQuery } from "../redux/api/api";
 import { removeNewMessagesAlert } from "../redux/reducers/chat";
 import { setIsFileMenu } from "../redux/reducers/misc";
 import { getSocket } from "../socket";
 import { TypingLoader } from "../components/layout/Loader";
+import { useNavigate } from "react-router-dom";
 
 const Chat = ({ chatId, user }) => {
   const containerRef = useRef(null);
   const fileMenuRef = useRef(null);
-
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const socket = getSocket();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [page, setPage] = useState(1);
   const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
-   const [IamTyping, setIamTyping] = useState(false);
+  const [IamTyping, setIamTyping] = useState(false);
   const [userTyping, setUserTyping] = useState(false);
   const typingTimeout = useRef(null);
   const bottomRef = useRef(null);
@@ -57,19 +63,17 @@ const Chat = ({ chatId, user }) => {
   const messageOnChange = (e) => {
     setMessage(e.target.value);
 
-    if(!IamTyping){
-    socket.emit(START_TYPING, { chatId, members });
-    setIamTyping(true)
-
+    if (!IamTyping) {
+      socket.emit(START_TYPING, { chatId, members });
+      setIamTyping(true);
     }
 
     if (typingTimeout.current) clearTimeout(typingTimeout.current);
 
     typingTimeout.current = setTimeout(() => {
       socket.emit(STOP_TYPING, { chatId, members });
-      setIamTyping(false)
+      setIamTyping(false);
     }, 2000);
-
   };
 
   const handleFileOpen = (e) => {
@@ -85,7 +89,7 @@ const Chat = ({ chatId, user }) => {
   };
 
   useEffect(() => {
-dispatch(removeNewMessagesAlert({ chatId }))
+    dispatch(removeNewMessagesAlert({ chatId }));
     return () => {
       setMessages([]);
       setMessage("");
@@ -100,6 +104,10 @@ dispatch(removeNewMessagesAlert({ chatId }))
     }
   }, [messages]);
 
+  useEffect(() => {
+    if (chatDetails.isError) return navigate("/");
+  }, [chatDetails.isError]);
+
   const newMessagesListener = useCallback(
     (data) => {
       if (data.chatId !== chatId) return;
@@ -109,17 +117,24 @@ dispatch(removeNewMessagesAlert({ chatId }))
     [chatId]
   );
 
-  const startTypingListener = useCallback((data)=>{
-    if(data.chatId !== chatId) return;
-    setUserTyping(true)
-  },[chatId])
+  const startTypingListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      setUserTyping(true);
+    },
+    [chatId]
+  );
 
-  const stopTypingListener = useCallback((data)=>{
-    if(data.chatId !== chatId) return
-    setUserTyping(false)
-  },[chatId])
+  const stopTypingListener = useCallback(
+    (data) => {
+      if (data.chatId !== chatId) return;
+      setUserTyping(false);
+    },
+    [chatId]
+  );
 
-    const alertListener = useCallback(
+
+  const alertListener = useCallback(
     (data) => {
       if (data.chatId !== chatId) return;
       const messageForAlert = {
@@ -137,12 +152,11 @@ dispatch(removeNewMessagesAlert({ chatId }))
     [chatId]
   );
 
-
   const eventHandler = {
     [ALERT]: alertListener,
     [NEW_MESSAGE]: newMessagesListener,
     [START_TYPING]: startTypingListener,
-    [STOP_TYPING]: stopTypingListener
+    [STOP_TYPING]: stopTypingListener,
   };
 
   useSocketEvents(socket, eventHandler);
@@ -171,10 +185,9 @@ dispatch(removeNewMessagesAlert({ chatId }))
           <MessageComponent key={i._id} user={user} message={i} />
         ))}
 
-        {userTyping && <TypingLoader/>}
+        {userTyping && <TypingLoader />}
 
         <div ref={bottomRef}></div>
-
       </Stack>
 
       <form

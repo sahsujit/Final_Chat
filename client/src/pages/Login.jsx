@@ -21,6 +21,7 @@ import toast from "react-hot-toast";
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const name = useInputValidation("");
   const bio = useInputValidation("");
   const username = useInputValidation("", usernameValidator);
@@ -34,6 +35,8 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const toastId = toast.loading("Logging In...");
+    setIsLoading(true);
     const config = {
       withCredentials: true,
       headers: {
@@ -51,14 +54,22 @@ const Login = () => {
         config
       );
       dispatch(userExists(data.user));
-      toast.success(data.message);
+      toast.success(data.message, {
+        id: toastId,
+      });
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something Went Wrong");
+      toast.error(error?.response?.data?.message || "Something Went Wrong", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleSignUp =async (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
+    const toastId = toast.loading("Signing Up...");
+    setIsLoading(true);
 
     const formData = new FormData();
 
@@ -76,15 +87,22 @@ const Login = () => {
     };
 
     try {
-      const {data} = await axios.post(`${server}/api/v1/user/new`,
+      const { data } = await axios.post(
+        `${server}/api/v1/user/new`,
         formData,
         config
-      )
+      );
 
-      dispatch(userExists(data.user))
-      toast.success(data.message)
+      dispatch(userExists(data.user));
+      toast.success(data.message, {
+        id: toastId,
+      });
     } catch (error) {
-      toast.error(error?.response?.data?.message || "Something Went Wrong")
+      toast.error(error?.response?.data?.message || "Something Went Wrong", {
+        id: toastId,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
   return (
@@ -148,6 +166,7 @@ const Login = () => {
                   sx={{ mt: "1rem" }}
                   variant="contained"
                   fullWidth
+                  disabled={isLoading}
                   color="primary"
                 >
                   Login
@@ -156,7 +175,12 @@ const Login = () => {
                   OR
                 </Typography>
 
-                <Button fullWidth variant="text" onClick={toggleLogin}>
+                <Button
+                  fullWidth
+                  variant="text"
+                  disabled={isLoading}
+                  onClick={toggleLogin}
+                >
                   Sign Up Instead
                 </Button>
               </form>
