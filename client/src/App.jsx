@@ -26,44 +26,57 @@ import { SocketProvider } from "./socket";
 
   
 const App = () => {
+const { user, loader } = useSelector((state) => state.auth);
 
-  const{user, loader} = useSelector((state)=>state.auth)
-    const dispatch = useDispatch();
+  const dispatch = useDispatch();
 
-  useEffect(()=>{
-   axios.get(`${server}/api/v1/user/me`, {withCredentials:true})
-   .then(({data})=>dispatch(userExists(data.user)))
-   .catch((err)=>dispatch(userNotExists()))
-  },[dispatch])
 
-  return loader ? <LayoutLoader/> : (
+
+  useEffect(() => {
+    axios
+      .get(`${server}/api/v1/user/me`, { withCredentials: true })
+      .then(({ data }) => dispatch(userExists(data.user)))
+      .catch((err) => dispatch(userNotExists()));
+  }, [dispatch]);
+
+ return loader ? (
+    <LayoutLoader />
+  ) : (
     <BrowserRouter>
-     <Suspense fallback={<LayoutLoader/>}> 
-     <Routes>
-        <Route  element={
+      <Suspense fallback={<LayoutLoader />}>
+        <Routes>
+          <Route
+            element={
               <SocketProvider>
                 <ProtectRoute user={user} />
               </SocketProvider>
-            }>
-          <Route path="/" element={<Home />} />
+            }
+          >
+            <Route path="/" element={<Home />} />
+            <Route path="/chat/:chatId" element={<Chat />} />
+            <Route path="/groups" element={<Groups />} />
+          </Route>
 
-          <Route path="/chat/:chatId" element={<Chat />} />
-          <Route path="/groups" element={<Groups />} />
-        </Route>
-        <Route path="/login" element={<ProtectRoute user={!user} redirect="/" >
-          <Login />
-        </ProtectRoute>} />
+          <Route
+            path="/login"
+            element={
+              <ProtectRoute user={!user} redirect="/">
+                <Login />
+              </ProtectRoute>
+            }
+          />
 
-        <Route path="/admin" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/users" element={<UserManagement />} />
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/admin/users" element={<UserManagement />} />
           <Route path="/admin/chats" element={<ChatManagement />} />
           <Route path="/admin/messages" element={<MessagesManagement />} />
 
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-     </Suspense>
-     <Toaster position="top-center"/>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+
+      <Toaster position="bottom-center" />
     </BrowserRouter>
   );
 };

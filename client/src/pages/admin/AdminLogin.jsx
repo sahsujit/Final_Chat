@@ -6,21 +6,32 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { bgGradient } from "../../constants/color";
+import { useDispatch, useSelector } from "react-redux";
+import { adminLogin, getAdmin } from "../../redux/thunks/admin";
 
-const isAdmin = true;
+
 
 const AdminLogin = () => {
+
+  const {isAdmin} = useSelector((state) => state.auth)
+  const dispatch = useDispatch()
 
 
   const secretKey = useInputValidation("");
 
   const submitHandler = (e) => {
     e.preventDefault();
+    dispatch(adminLogin(secretKey.value))
    
   };
+
+  useEffect(() => {
+    dispatch(getAdmin())
+  }, [dispatch])
+  
 
  
 
