@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 const useErrors = (errors = []) => {
   useEffect(() => {
@@ -64,77 +65,51 @@ const useSocketEvents = (socket, handler) =>{
 
 
 
+const useFetchData = (url, key = "") => {
+  const [data, setData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-export{useErrors, useAsyncMutation, useSocketEvents}
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const { data } = await axios.get(url, {
+          withCredentials: true, // important if backend uses cookies
+        });
+        if (isMounted) {
+          setData(data);
+          setError(null);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err);
+          console.error("Fetch error:", err);
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [url, key]);
+
+  return { data, loading, error };
+};
 
 
 
 
 
+export{useErrors, useAsyncMutation, useSocketEvents, useFetchData}
 
 
 
-// import { useEffect, useState } from "react";
-// import toast from "react-hot-toast";
 
-// // ✅ useErrors Hook
-// const useErrors = (errors = []) => {
-//   useEffect(() => {
-//     if (!Array.isArray(errors)) return;
 
-//     errors.forEach(({ isError, error, fallback }) => {
-//       if (isError) {
-//         if (fallback) fallback();
-//         else toast.error(error?.data?.message || "Something went wrong");
-//       }
-//     });
-//   }, [JSON.stringify(errors)]); // Ensures reactivity on value change
-// };
-
-// // ✅ useAsyncMutation Hook
-// const useAsyncMutation = (mutationHook) => {
-//   const [isLoading, setIsLoading] = useState(false);
-//   const [data, setData] = useState(null);
-
-//   const [mutate] = mutationHook();
-
-//   const executeMutation = async ({ message = "Updating data...", args = [] } = {}) => {
-//     setIsLoading(true);
-//     const toastId = toast.loading(message);
-
-//     try {
-//       const res = await mutate(...args);
-
-//       if (res.data) {
-//         toast.success(res.data.message || "Updated successfully", { id: toastId });
-//         setData(res.data);
-//       } else {
-//         toast.error(res?.error?.data?.message || "Something went wrong", { id: toastId });
-//       }
-//     } catch (error) {
-//       console.error(error);
-//       toast.error("Something went wrong", { id: toastId });
-//     } finally {
-//       setIsLoading(false);
-//     }
-//   };
-
-//   return [executeMutation, isLoading, data];
-// };
-
-// // ✅ useSocketEvents Hook
-// const useSocketEvents = (socket, handlers) => {
-//   useEffect(() => {
-//     Object.entries(handlers).forEach(([event, callback]) => {
-//       socket.on(event, callback);
-//     });
-
-//     return () => {
-//       Object.entries(handlers).forEach(([event, callback]) => {
-//         socket.off(event, callback);
-//       });
-//     };
-//   }, [socket, handlers]);
-// };
-
-// export { useErrors, useAsyncMutation, useSocketEvents };

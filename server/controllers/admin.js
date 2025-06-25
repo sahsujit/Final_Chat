@@ -184,8 +184,6 @@
 
 
 
-
-
 import jwt from "jsonwebtoken";
 import { TryCatch } from "../middlewares/error.js";
 import { Chat } from "../models/chat.js";
@@ -230,7 +228,6 @@ const adminLogout = TryCatch(async (req, res, next) => {
 });
 
 const getAdminData = TryCatch(async (req, res, next) => {
-console.log(res)
   return res.status(200).json({
     admin: true,
   });

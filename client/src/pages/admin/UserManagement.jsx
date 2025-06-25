@@ -4,6 +4,8 @@ import AdminLayout from "../../components/layout/AdminLayout";
 import Table from "../../components/shared/Table";
 import { dashboardData } from "../../constants/sampleData";
 import { transformImage } from "../../lib/features";
+import { server } from "../../constants/config";
+import { useErrors, useFetchData } from "../../hooks/hook";
 
 const columns = [
   {
@@ -48,17 +50,44 @@ const columns = [
   },
 ];
 const UserManagement = () => {
-  const [rows, setRows] = useState([]);
 
-  useEffect(() => {
-    setRows(dashboardData.users.map((i) => ({ ...i,
+  const { loading, data, error } = useFetchData(
+    `${server}/api/v1/admin/users`,
+    "dashboard-users"
+  );
+
+  console.log(data);
+
+  useErrors([
+    {
+      isError: error,
+      error: error,
+    },
+  ]);
+  const [rows, setRows] = useState([]);
+useEffect(() => {
+  if (Array.isArray(data?.users)) {
+    setRows(
+      data.users.map((i) => ({
+        ...i,
         id: i._id,
-        avatar: transformImage(i.avatar, 50), })));
-  }, []);
+        avatar: transformImage(i.avatar, 50),
+      }))
+    );
+  } else {
+    setRows([]); // reset rows if no users
+  }
+}, [data]);
+
+
 
   return (
     <AdminLayout>
-      <Table heading={"All Users"} columns={columns} rows={rows} />
+      {loading ? (
+        <Skeleton height={"100vh"} />
+      ) : (
+        <Table heading={"All Users"} columns={columns} rows={rows} />
+      )}
     </AdminLayout>
   );
 };

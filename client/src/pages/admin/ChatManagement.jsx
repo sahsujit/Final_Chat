@@ -1,4 +1,4 @@
-import { useFetchData } from "6pp";
+
 import { Avatar, Skeleton, Stack } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
@@ -7,6 +7,8 @@ import Table from "../../components/shared/Table";
 
 import { transformImage } from "../../lib/features";
 import { dashboardData } from "../../constants/sampleData";
+import { server } from "../../constants/config";
+import { useErrors, useFetchData } from "../../hooks/hook";
 
 const columns = [
   {
@@ -73,25 +75,46 @@ const columns = [
 
 const ChatManagement = () => {
   
+  const { loading, data, error } = useFetchData(
+    `${server}/api/v1/admin/chats`,
+    "dashboard-chats"
+  );
 
+  useErrors([
+    {
+      isError: error,
+      error: error,
+    },
+  ]);
 
   const [rows, setRows] = useState([]);
-  const loading = false;
 
-  useEffect(() => {
+
+useEffect(() => {
+  if (Array.isArray(data?.chats)) {
     setRows(
-dashboardData.chats.map((i) => ({
-          ...i,
-          id: i._id,
-          avatar: i.avatar.map((i) => transformImage(i, 50)),
-          members: i.members.map((i) => transformImage(i.avatar, 50)),
-          creator: {
-            name: i.creator.name,
-            avatar: transformImage(i.creator.avatar, 50),
-          },
-        }))
-      );
-  }, []);
+      data.chats.map((chat) => ({
+        ...chat,
+        id: chat._id,
+        avatar: Array.isArray(chat.avatar)
+          ? chat.avatar.map((a) => transformImage(a, 50))
+          : [],
+        members: Array.isArray(chat.members)
+          ? chat.members.map((m) => transformImage(m.avatar, 50))
+          : [],
+        creator: chat.creator
+          ? {
+              name: chat.creator.name,
+              avatar: transformImage(chat.creator.avatar, 50),
+            }
+          : { name: "Unknown", avatar: "" },
+      }))
+    );
+  } else {
+    setRows([]);
+  }
+}, [data]);
+
 
   return (
     <AdminLayout>

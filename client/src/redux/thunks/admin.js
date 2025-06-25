@@ -33,7 +33,7 @@ const getAdmin = createAsyncThunk("admin/getAdmin", async (_, thunkAPI) => {
     const { data } = await axios.get(`${server}/api/v1/admin/`, {
       withCredentials: true,
     });
-
+    console.log(data.admin);
     return data.admin;
   } catch (error) {
     return thunkAPI.rejectWithValue(error?.response?.data?.message || "Failed to get admin");

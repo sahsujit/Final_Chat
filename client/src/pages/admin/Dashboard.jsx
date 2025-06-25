@@ -1,30 +1,29 @@
-// import { useFetchData } from "6pp";
-// import {
-//   AdminPanelSettings as AdminPanelSettingsIcon,
-//   Group as GroupIcon,
-//   Message as MessageIcon,
-//   Notifications as NotificationsIcon,
-//   Person as PersonIcon,
-// } from "@mui/icons-material";
-// import {
-//   Box,
-//   Container,
-//   Paper,
-//   Skeleton,
-//   Stack,
-//   Typography,
-// } from "@mui/material";
-// import moment from "moment";
-// import React from "react";
-// import AdminLayout from "../../components/layout/AdminLayout";
-// import {
-//   CurveButton,
-//   SearchField,
-// } from "../../components/styles/StyledComponent";
-// import { matBlack } from "../../constants/color";
-// import { DoughnutChart, LineChart } from "../../components/specific/Charts";
-// import { server } from "../../constants/config";
-// import { useErrors } from "../../hooks/hook";
+import {
+  AdminPanelSettings as AdminPanelSettingsIcon,
+  Group as GroupIcon,
+  Message as MessageIcon,
+  Notifications as NotificationsIcon,
+  Person as PersonIcon,
+} from "@mui/icons-material";
+import {
+  Box,
+  Container,
+  Paper,
+  Skeleton,
+  Stack,
+  Typography,
+} from "@mui/material";
+import moment from "moment";
+import React from "react";
+import AdminLayout from "../../components/layout/AdminLayout";
+import {
+  CurveButton,
+  SearchField,
+} from "../../components/styles/StyledComponent";
+import { matBlack } from "../../constants/color";
+import { DoughnutChart, LineChart } from "../../components/specific/Charts";
+import { server } from "../../constants/config";
+import { useErrors, useFetchData } from "../../hooks/hook";
 
 // const Dashboard = () => {
 
@@ -219,55 +218,13 @@
 //   </Paper>
 // );
 
-// export default Dashboard;
 
-
-
-
-
-
-
-
-
-
-
-import { useFetchData } from "6pp";
-import {
-  AdminPanelSettings as AdminPanelSettingsIcon,
-  Group as GroupIcon,
-  Message as MessageIcon,
-  Notifications as NotificationsIcon,
-  Person as PersonIcon,
-} from "@mui/icons-material";
-import {
-  Box,
-  Container,
-  Paper,
-  Skeleton,
-  Stack,
-  Typography,
-} from "@mui/material";
-import moment from "moment";
-import React from "react";
-import AdminLayout from "../../components/layout/AdminLayout";
-import { DoughnutChart, LineChart } from "../../components/specific/Charts";
-import {
-  CurveButton,
-  SearchField,
-} from "../../components/styles/StyledComponent";
-import { matBlack } from "../../constants/color";
-import { server } from "../../constants/config";
-import { useErrors } from "../../hooks/hook";
 
 const Dashboard = () => {
   const { loading, data, error } = useFetchData(
     `${server}/api/v1/admin/stats`,
     "dashboard-stats"
   );
-
-  console.log(data);
-
-
 
   const { stats } = data || {};
 
@@ -330,7 +287,6 @@ const Dashboard = () => {
       />
     </Stack>
   );
-  console.log(stats);
 
   return (
     <AdminLayout>
@@ -351,7 +307,7 @@ const Dashboard = () => {
               xs: "center",
               lg: "stretch",
             }}
-            sx={{ gap: "2rem" }}
+            sx={{ gap: "1rem" }}
           >
             <Paper
               elevation={3}
@@ -446,4 +402,15 @@ const Widget = ({ title, value, Icon }) => (
 );
 
 export default Dashboard;
+
+
+
+
+
+
+
+
+
+
+
 
