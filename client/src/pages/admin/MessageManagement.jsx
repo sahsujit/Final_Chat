@@ -1,15 +1,14 @@
 
 import { Avatar, Box, Skeleton, Stack } from "@mui/material";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import RenderAttachment from "../../components/shared/RenderAttachment";
 import Table from "../../components/shared/Table";
 
-import { fileFormat, transformImage } from "../../lib/features";
-import { dashboardData } from "../../constants/sampleData";
 import { server } from "../../constants/config";
 import { useErrors, useFetchData } from "../../hooks/hook";
+import { fileFormat, transformImage } from "../../lib/features";
 
 const columns = [
   {
@@ -120,7 +119,7 @@ useEffect(() => {
       }))
     );
   } else {
-    setRows([]); // Clear rows if no messages or invalid data
+    setRows([]); 
   }
 }, [data]);
 

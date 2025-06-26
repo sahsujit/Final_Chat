@@ -1,14 +1,13 @@
 
 import { Avatar, Skeleton, Stack } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AdminLayout from "../../components/layout/AdminLayout";
 import AvatarCard from "../../components/shared/AvatarCard";
 import Table from "../../components/shared/Table";
 
-import { transformImage } from "../../lib/features";
-import { dashboardData } from "../../constants/sampleData";
 import { server } from "../../constants/config";
 import { useErrors, useFetchData } from "../../hooks/hook";
+import { transformImage } from "../../lib/features";
 
 const columns = [
   {
