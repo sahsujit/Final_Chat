@@ -14,7 +14,7 @@ import { Server } from "socket.io";
 import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
 import adminRoute from "./routes/admin.js";
-import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from "./constants/event.js";
+import { CHAT_JOINED, CHAT_LEAVED, NEW_MESSAGE, NEW_MESSAGE_ALERT, ONLINE_USERS, START_TYPING, STOP_TYPING } from "./constants/event.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
@@ -34,6 +34,7 @@ const port = process.env.PORT || 5000;
  const adminSecretKey = process.env.ADMIN_SECRET_KEY || "anonadmin";
  const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
 const userSocketIDs = new Map();
+const onlineUsers = new Set()
 
 
 connectDB();
@@ -132,8 +133,9 @@ socket.on(NEW_MESSAGE, async({message, chatId, members})=>{
   });
 
   socket.on("disconnect", () => {
-    console.log("Disconnected from socket.io");
-  userSocketIDs.delete(user._id.toString());
+    userSocketIDs.delete(user._id.toString());
+    onlineUsers.delete(user._id.toString());
+    socket.broadcast.emit(ONLINE_USERS, Array.from(onlineUsers));
   });
 });
 

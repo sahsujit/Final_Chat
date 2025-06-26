@@ -23,6 +23,7 @@ import Header from "./Header";
 import { useEffect } from "react";
 import { getOrSaveFromStorage } from "../../lib/features";
 import DeleteChatMenu from "../dialogs/DeleteChatMenu";
+import { useState } from "react";
 
 const AppLayout = (WrappedComponent) => {
   return (props) => {
@@ -35,6 +36,8 @@ const AppLayout = (WrappedComponent) => {
     const dispatch = useDispatch();
     const navigate = useNavigate()
     const deleteMenuAnchor = useRef(null)
+
+        const [onlineUsers, setOnlineUsers] = useState([]);
 
     const { isLoading, data, isError, error, refetch } = useMyChatsQuery("");
     useErrors([{ isError, error }]);
@@ -74,7 +77,7 @@ const AppLayout = (WrappedComponent) => {
     }, [refetch,navigate]);
 
     const onlineUsersListener = useCallback((data) => {
-      // dispatch(setOnlineUsers(data))
+     setOnlineUsers(data)
     }, []);
 
     const eventHandlers = {
@@ -104,9 +107,9 @@ const AppLayout = (WrappedComponent) => {
               w="70vw"
               chats={data?.chats}
               chatId={chatId}
-              // handleDeleteChat={handleDeleteChat}
+              handleDeleteChat={handleDeleteChat}
               newMessagesAlert={newMessagesAlert}
-              // onlineUsers={onlineUsers}
+              onlineUsers={onlineUsers}
             />
           </Drawer>
         )}
@@ -125,6 +128,7 @@ const AppLayout = (WrappedComponent) => {
                 chatId={chatId}
                 handleDeleteChat={handleDeleteChat}
                 newMessagesAlert={newMessagesAlert}
+                   onlineUsers={onlineUsers}
               />
             )}
           </Grid>
